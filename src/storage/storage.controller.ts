@@ -5,6 +5,7 @@ import StorageService from './storage.service';
 import * as Multer from 'multer';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import User from '../entities/User';
+import AuthService from '../auth/auth.service';
 
 @Controller("storage")
 export default class StorageController{
@@ -17,15 +18,20 @@ export default class StorageController{
     @Query('override') override: string,
     @Req() request: Request
   ) {
-    console.log(files )
+    let overrideBool: boolean = override === "true";
     console.log("Check auth and get user folder and make mapping better")
-    const user:User = new User("testUser", "testUserpassword", BigInt(22222), 1)
     if (!files) {
       return new HttpException("No files provided", HttpStatus.BAD_REQUEST);
     }
+    const jwt = request.headers.authorization;
+    if(!jwt){
+      return new HttpException("Authorization failed", HttpStatus.UNAUTHORIZED);
+    }
 
-    let overrideBool: boolean = override === "true";
+    //const usr: User = await AuthService.prototype.validateUser(jwt);
+    const unixTimestmap:bigint = BigInt(Date.now());
+    const templateUser = new User("test", "test", unixTimestmap, 0);
 
-    return this.storageService.upload(files, user, overrideBool);
+    return this.storageService.upload(files, templateUser, overrideBool);
   }
 }

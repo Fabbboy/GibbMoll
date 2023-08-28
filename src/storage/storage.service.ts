@@ -9,6 +9,6 @@ import { from, isNone, None, Option } from "../RO/Option";
 @Injectable({})
 export default class StorageService{
   async upload(files: Array<Multer.File>,user:User, override:boolean){
-    console.log("upload")
+    
   }
 }
