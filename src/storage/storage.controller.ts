@@ -1,9 +1,10 @@
-import { Controller, Post, UploadedFiles, UseInterceptors, Query, Req } from '@nestjs/common';
+import { Controller, Post, UploadedFiles, UseInterceptors, Query, Req, Body } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express'; // Import the express Request type for better type checking
 import StorageService from './storage.service';
 import * as Multer from 'multer';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import User from '../entities/User';
 
 @Controller("storage")
 export default class StorageController{
@@ -13,10 +14,18 @@ export default class StorageController{
   @UseInterceptors(FilesInterceptor("file"))
   async upload(
     @UploadedFiles() files: Array<Multer.File>,
-    @Query('filename') filename: string,
-    @Query('size') size: number,
+    @Query('override') override: string,
     @Req() request: Request
   ) {
-    return this.storageService.upload(files, filename, size);
+    console.log(files )
+    console.log("Check auth and get user folder")
+    const user:User = new User("testUser", "testUserpassword")
+    if (!files) {
+      return new HttpException("No files provided", HttpStatus.BAD_REQUEST);
+    }
+
+    let overrideBool: boolean = override === "true";
+
+    return this.storageService.upload(files, user, overrideBool);
   }
 }
