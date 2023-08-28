@@ -18,7 +18,7 @@ export default class StorageController{
     @Req() request: Request
   ) {
     console.log(files )
-    console.log("Check auth and get user folder")
+    console.log("Check auth and get user folder and make mapping better")
     const user:User = new User("testUser", "testUserpassword")
     if (!files) {
       return new HttpException("No files provided", HttpStatus.BAD_REQUEST);

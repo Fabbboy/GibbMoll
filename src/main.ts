@@ -4,6 +4,11 @@ import * as fs from 'fs';
 async function bootstrap() {
   if(!fs.existsSync(".cloud")) 
     fs.mkdirSync(".cloud");
+  if(!fs.existsSync(".cloud/users"))
+    fs.mkdirSync(".cloud/users");
+
+  if(!fs.existsSync(".cloud/map.json"))
+    fs.writeFileSync(".cloud/map.json", "{}");
   
 
   const app = await NestFactory.create(AppModule);
