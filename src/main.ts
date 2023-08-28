@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as fs from 'fs';
+import dotenv from 'dotenv';
 async function bootstrap() {
   if(!fs.existsSync(".cloud")) 
     fs.mkdirSync(".cloud");
@@ -14,4 +15,5 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   await app.listen(3000);
 }
+console.log(dotenv.config() + "hshs")
 bootstrap();

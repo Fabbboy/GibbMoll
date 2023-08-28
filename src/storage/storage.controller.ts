@@ -19,7 +19,7 @@ export default class StorageController{
   ) {
     console.log(files )
     console.log("Check auth and get user folder and make mapping better")
-    const user:User = new User("testUser", "testUserpassword")
+    const user:User = new User("testUser", "testUserpassword", BigInt(22222), 1)
     if (!files) {
       return new HttpException("No files provided", HttpStatus.BAD_REQUEST);
     }

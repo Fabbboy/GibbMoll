@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import { Option, from, isNone } from "../RO/Option.js";
+import dotenv from "dotenv";
 
 export function generateDefault() {
   if (fs.existsSync("config.json")) return;
@@ -29,14 +30,12 @@ class Config {
   hostPort: Option<number>;
 
   constructor() {
-    let obj: any = JSON.parse(fs.readFileSync("config.json").toString());
-
-    this.host = from(obj["database"]["host"]);
-    this.port = from(obj["database"]["port"]);
-    this.user = from(obj["database"]["user"]);
-    this.password = from(obj["database"]["password"]);
-    this.database = from(obj["database"]["database"]);
-    this.hostPort = from(obj["database"]["hostPort"] || 3000);
+    this.host = from(process.env.DB_HOST);
+    this.port = from(parseInt(process.env.DB_PORT));
+    this.user = from(process.env.DB_USER);
+    this.password = from(process.env.DB_PASSWORD);
+    this.database = from(process.env.DB);
+    this.hostPort = from(parseInt(process.env.HOST_PORT));
 
     if (
       isNone(this.host) ||
@@ -45,7 +44,7 @@ class Config {
       isNone(this.password) ||
       isNone(this.database)
     ) {
-      throw new Error("Could not read Database file");
+      throw new Error("Could not read Database file: " + JSON.stringify(Object.values(this)));
     }
   }
 }
