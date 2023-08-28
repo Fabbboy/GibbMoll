@@ -2,7 +2,7 @@ import * as mariadb from "mariadb";
 import Config from "./Config.js";
 import { unwrap } from "../RO/Option.js";
 
-class Database {
+export class Database {
   connector: mariadb.Pool;
 
   constructor(config: Config) {
@@ -39,4 +39,5 @@ class Database {
   }
 }
 
-export default Database;
+const database = new Database(new Config())
+export default database;

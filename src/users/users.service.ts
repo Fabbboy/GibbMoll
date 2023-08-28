@@ -1,8 +1,11 @@
 import { Injectable } from "@nestjs/common";
-
-export type User = any;
+import database from "src/Database/Database";
 
 @Injectable()
 export class UsersService {
-  
+  async findOne(username: string) : Promise<User | undefined> {
+    let result = database.run("SELECT * from users WHERE username = ?", username)
+    console.log(result)
+    return result
+  }
 }
