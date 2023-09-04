@@ -1,5 +1,5 @@
 export interface UserWithoutPassword {
-  username: string,
-  creationDate: bigint,
-  id: number
+  username: string;
+  creationDate: bigint;
+  id: number;
 }

@@ -20,7 +20,7 @@ class Result<T, E> {
 
   unwarp(): T {
     if (this._error) {
-      throw new Error("Cannot unwrap error: " + this.value);
+      throw new Error('Cannot unwrap error: ' + this.value);
     }
 
     return this._value as T;
@@ -32,7 +32,6 @@ class Result<T, E> {
     } catch (_) {
       throw new Error(error);
     }
-
   }
 
   private constructor(value: T | E, error: boolean) {
