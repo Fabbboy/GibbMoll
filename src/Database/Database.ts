@@ -1,6 +1,6 @@
-import * as mariadb from "mariadb";
-import Config from "./Config.js";
-import { unwrap } from "../RO/Option.js";
+import * as mariadb from 'mariadb';
+import Config from './Config.js';
+import { unwrap } from '../RO/Option.js';
 
 export class Database {
   connector: mariadb.Pool;
@@ -22,7 +22,7 @@ export class Database {
     });*/
 
     if (this.connector == null) {
-      console.error("A connection to the database could not be established");
+      console.error('A connection to the database could not be established');
       process.exit(1);
     }
   }
@@ -38,5 +38,8 @@ export class Database {
     return await this.connector.query(query, ...args);
   }
 }
-const database = new Database(new Config())
+const database = new Database(new Config());
+
+//rocket nest expres
+
 export default database;

@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { Option, from, isNone } from '../RO/Option.js';
 import * as dotenv from 'dotenv';
 
-let initalized = false
+let initalized = false;
 
 class Config {
   host: Option<string>;
@@ -14,10 +14,9 @@ class Config {
 
   constructor() {
     if (!initalized) {
-      dotenv.config()
+      dotenv.config();
       initalized = true;
     }
-    console.log(process.env)
 
     this.host = from(process.env.DB_HOST);
     this.port = from(parseInt(process.env.DB_PORT));
