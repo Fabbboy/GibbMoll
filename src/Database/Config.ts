@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import { Option, from, isNone } from '../RO/Option.js';
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 
 let initalized = false
 
