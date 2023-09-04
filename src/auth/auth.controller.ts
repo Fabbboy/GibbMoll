@@ -1,15 +1,11 @@
-import { Put, Body, Controller, Get, HttpException, Delete, HttpStatus, Post, Query, Param, HttpCode } from "@nestjs/common";
+import { Controller, Post, Request, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 
-import AuthService from "./auth.service";
-
-@Controller("auth")
-export default class AuthController{
-  constructor(private authService: AuthService){}
-
-  @HttpCode(HttpStatus.OK)
+@Controller('auth')
+export class AuthController {
+  @UseGuards(AuthGuard('local'))
   @Post('login')
-  signIn(@Body() singInDto: Record<string, any>) {
-    return this.authService.signIn(singInDto.username, singInDto.password)
+  async login(@Request() req) {
+    return req.user;
   }
-  
 }

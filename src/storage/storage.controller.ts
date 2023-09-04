@@ -5,7 +5,6 @@ import StorageService from './storage.service';
 import * as Multer from 'multer';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import User from '../entities/User';
-import AuthService from '../auth/auth.service';
 
 @Controller("storage")
 export default class StorageController{

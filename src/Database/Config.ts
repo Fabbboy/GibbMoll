@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import { Option, from, isNone } from "../RO/Option.js";
-import dotenv from "dotenv";
+import * as dotenv from "dotenv";
 
 export function generateDefault() {
   if (fs.existsSync("config.json")) return;
@@ -21,6 +21,9 @@ export function generateDefault() {
     )
   );
 }
+
+let initalized: boolean = false;
+
 class Config {
   host: Option<string>;
   port: Option<number>;
@@ -30,6 +33,12 @@ class Config {
   hostPort: Option<number>;
 
   constructor() {
+    if (!initalized) {
+      dotenv.config()
+      initalized = true;
+    }
+    console.log(process.env)
+
     this.host = from(process.env.DB_HOST);
     this.port = from(parseInt(process.env.DB_PORT));
     this.user = from(process.env.DB_USER);

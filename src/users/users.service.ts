@@ -7,6 +7,9 @@ export class UsersService {
   async findOne(username: string) {
     let result = await database.run("SELECT * from users WHERE username = ?", username)
     console.log(result)
+    if (result.length == 0) {
+      return null;
+    }
     return new User(result.username, result.password, result.creationDate, result.id)
   }
 }
