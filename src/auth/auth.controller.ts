@@ -10,9 +10,11 @@ export class AuthController {
   async login(@Request() req) {
     let user: User = req.user;
 
-    return {id: user.id, 
-            username: user.username,
-          password: user.password,
-        creationDate: user.creationDate.toString()};
+    return {
+      id: user.id,
+      username: user.username,
+      password: user.password,
+      creationDate: user.creationDate.toString(),
+    };
   }
 }
