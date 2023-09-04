@@ -40,6 +40,4 @@ export class Database {
 }
 const database = new Database(new Config());
 
-//rocket nest expres
-
 export default database;
