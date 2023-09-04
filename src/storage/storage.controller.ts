@@ -15,7 +15,6 @@ import StorageService from './storage.service';
 import * as Multer from 'multer';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import User from '../entities/User';
-import AuthService from '../auth/auth.service';
 import { UploadFileDto } from './storage.dto';
 import { from } from '../RO/Option';
 

@@ -11,6 +11,12 @@ class Config {
   hostPort: Option<number>;
 
   constructor() {
+    if (!initalized) {
+      dotenv.config()
+      initalized = true;
+    }
+    console.log(process.env)
+
     this.host = from(process.env.DB_HOST);
     this.port = from(parseInt(process.env.DB_PORT));
     this.user = from(process.env.DB_USER);
