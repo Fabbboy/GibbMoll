@@ -1,26 +1,7 @@
-import * as fs from "fs";
-import { Option, from, isNone } from "../RO/Option.js";
-import dotenv from "dotenv";
+import * as fs from 'fs';
+import { Option, from, isNone } from '../RO/Option.js';
+import dotenv from 'dotenv';
 
-export function generateDefault() {
-  if (fs.existsSync("config.json")) return;
-  fs.writeFileSync(
-    "config.json",
-    JSON.stringify(
-      {
-        database: {
-          host: "localhost",
-          port: 3306,
-          user: "",
-          password: "",
-          database: "",
-        },
-      },
-      null,
-      4
-    )
-  );
-}
 class Config {
   host: Option<string>;
   port: Option<number>;
@@ -44,7 +25,9 @@ class Config {
       isNone(this.password) ||
       isNone(this.database)
     ) {
-      throw new Error("Could not read Database file: " + JSON.stringify(Object.values(this)));
+      throw new Error(
+        'Could not read Database file: ' + JSON.stringify(Object.values(this)),
+      );
     }
   }
 }

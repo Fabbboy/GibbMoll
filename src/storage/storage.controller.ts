@@ -1,4 +1,14 @@
-import { Controller, Post, UploadedFiles, UseInterceptors, Query, Req, Body } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  UploadedFiles,
+  UseInterceptors,
+  Query,
+  Req,
+  Body,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express'; // Import the express Request type for better type checking
 import StorageService from './storage.service';
@@ -6,32 +16,36 @@ import * as Multer from 'multer';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import User from '../entities/User';
 import AuthService from '../auth/auth.service';
+import { UploadFileDto } from './storage.dto';
+import { from } from '../RO/Option';
 
-@Controller("storage")
-export default class StorageController{
-  constructor(private storageService: StorageService){}
+@Controller('storage')
+export default class StorageController {
+  constructor(private storageService: StorageService) {}
 
-  @Post("upload")
-  @UseInterceptors(FilesInterceptor("file"))
+  @Post('upload')
+  @UseInterceptors(FilesInterceptor('file'))
+  @UsePipes(new ValidationPipe())
   async upload(
     @UploadedFiles() files: Array<Multer.File>,
-    @Query('override') override: string,
-    @Req() request: Request
+    @Query() uploadFileDto: UploadFileDto,
+    @Req() request,
   ) {
-    let overrideBool: boolean = override === "true";
-    console.log("Check auth and get user folder and make mapping better")
     if (!files) {
-      return new HttpException("No files provided", HttpStatus.BAD_REQUEST);
+      return new HttpException('No files provided', HttpStatus.BAD_REQUEST);
     }
     const jwt = request.headers.authorization;
-    if(!jwt){
-      return new HttpException("Authorization failed", HttpStatus.UNAUTHORIZED);
+    if (!jwt) {
+      return new HttpException(
+        'Authorization not provided',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
 
-    //const usr: User = await AuthService.prototype.validateUser(jwt);
-    const unixTimestmap:bigint = BigInt(Date.now());
-    const templateUser = new User("test", "test", unixTimestmap, 0);
-
-    return this.storageService.upload(files, templateUser, overrideBool);
+    return this.storageService.upload(
+      request,
+      files,
+      from(uploadFileDto.override),
+    );
   }
 }
