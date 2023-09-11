@@ -27,6 +27,7 @@ export default class StorageService {
 
     return {
       message: 'File uploaded successfully',
+      paths: files.map((file) => path + '/' + file.originalname),
     };
   }
 }
