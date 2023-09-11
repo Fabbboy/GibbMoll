@@ -31,9 +31,6 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     context: ExecutionContext,
     status?: any,
   ): TUser {
-    console.log(user);
-    console.error(err);
-
     if (err || !user) {
       throw err || new UnauthorizedException();
     }

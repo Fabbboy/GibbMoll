@@ -11,7 +11,6 @@ export class UsersService {
         username,
       )) as Array<User>
     ).pop();
-    console.log(result);
     return new User(
       result.username,
       result.password,

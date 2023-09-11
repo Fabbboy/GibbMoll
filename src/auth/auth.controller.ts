@@ -11,6 +11,7 @@ import User from 'src/entities/User';
 import { LocalAuthGuard } from './local-guard.guard';
 import { Public } from './public.decorator';
 import { JwtService } from '@nestjs/jwt';
+import { AuthService } from './auth.service';
 
 function unixTimestmap() {
   return Math.floor(Date.now() / 1000);
@@ -18,15 +19,15 @@ function unixTimestmap() {
 
 @Controller('auth')
 export class AuthController {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private authService: AuthService,
+  ) {}
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @Public()
   async login(@Request() req) {
     let user: User = req.user;
-
-    const payload = { sub: user.id, username: user.username };
-
-    return { accessToken: this.jwtService.sign(payload) };
+    return this.authService.login(user);
   }
 }
