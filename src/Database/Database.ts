@@ -38,6 +38,7 @@ export class Database {
     return await this.connector.query(query, ...args);
   }
 }
-const database = new Database(new Config());
+export const config = new Config();
+const database = new Database(config);
 
 export default database;
