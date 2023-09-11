@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import * as fs from 'fs';
 import { FileService } from './storage/manager/FileService';
 
-const fileService: FileService = new FileService();
+export const fileService: FileService = new FileService();
 
 async function bootstrap() {
   if (!fs.existsSync('.cloud')) fs.mkdirSync('.cloud');
