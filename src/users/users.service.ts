@@ -5,7 +5,7 @@ import User from 'src/entities/User';
 @Injectable()
 export class UsersService {
   async findOne(username: string) {
-    let result: User = (
+    const result: User = (
       (await database.connector.query(
         'SELECT * from users WHERE username = ?',
         username,
@@ -17,5 +17,14 @@ export class UsersService {
       result.creationDate,
       result.id,
     );
+  }
+  
+  async createOne(user: Omit<User, 'id'>) {
+    const result = await database.connector.query(
+      `INSERT INTO users (username, password, creationDate) VALUES (?, ?, ?)`,
+      [user.username, user.password, user.creationDate],
+    );
+
+    console.log(result);
   }
 }

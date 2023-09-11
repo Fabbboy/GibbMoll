@@ -5,6 +5,7 @@ import { UserWithoutPassword } from './user.dto';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ContextIdFactory, ModuleRef } from '@nestjs/core';
 import { Request } from 'express';
+import User from 'src/entities/User';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -16,7 +17,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     request: Request,
     username: string,
     password: string,
-  ): Promise<UserWithoutPassword> {
+  ): Promise<Omit<User, 'password'>> {
     const contextIdfick = ContextIdFactory.getByRequest(request);
     const authService = await this.moduleRef.resolve(
       AuthService,
