@@ -8,6 +8,7 @@ import {
   Body,
   UsePipes,
   ValidationPipe,
+  Get,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express'; // Import the express Request type for better type checking
@@ -39,5 +40,10 @@ export default class StorageController {
       files,
       from(uploadFileDto.override),
     );
+  }
+
+  @Get('list')
+  async list(@Req() request) {
+    return this.storageService.list(request);
   }
 }

@@ -13,6 +13,7 @@ export default class StorageService {
     override: Option<string>,
   ) {
     const path = fileService.createOrGetUserFolder(req['user'].username);
+    console.log(files); 
     for (let file of files) {
       if (isNone(override)) {
         if (fs.existsSync(`${path}/${file.originalname}`)) {
@@ -28,6 +29,14 @@ export default class StorageService {
     return {
       message: 'File uploaded successfully',
       paths: files.map((file) => path + '/' + file.originalname),
+    };
+  }
+
+  async list(req: Request) {
+    const path = fileService.createOrGetUserFolder(req['user'].username);
+    const files = fs.readdirSync(path);
+    return {
+      files: files.map((file) => path + '/' + file),
     };
   }
 }
