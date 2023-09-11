@@ -1,13 +1,13 @@
 export default class User {
   username: string;
   password: string;
-  creationDate: bigint;
+  creationDate: number;
   id: number;
 
   constructor(
     username: string,
     password: string,
-    creationDate: bigint,
+    creationDate: number,
     id: number,
   ) {
     this.username = username;

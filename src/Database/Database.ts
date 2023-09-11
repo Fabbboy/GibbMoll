@@ -22,7 +22,6 @@ export class Database {
     });*/
 
     if (this.connector == null) {
-      console.error('A connection to the database could not be established');
       process.exit(1);
     }
   }

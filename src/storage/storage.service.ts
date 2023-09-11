@@ -13,7 +13,7 @@ export default class StorageService {
     override: Option<string>,
   ) {
     const path = fileService.createOrGetUserFolder(req['user'].username);
-    for (let file of files) {
+    for (const file of files) {
       if (isNone(override)) {
         if (fs.existsSync(`${path}/${file.originalname}`)) {
           return new HttpException(

@@ -12,12 +12,12 @@ export class File {
   name: string;
   creator: User;
   path: string;
-  size: BigInt;
+  size: bigint;
   zip: boolean;
   type: FileTypes;
   content: Option<Bytearray>;
-  createdAt: BigInt;
-  updatedAt: Option<BigInt>;
+  createdAt: bigint;
+  updatedAt: Option<bigint>;
   parent: Option<string>;
   isShared: Option<boolean>;
 
@@ -25,12 +25,12 @@ export class File {
     creator: User,
     name: string,
     path: string,
-    size: BigInt,
+    size: bigint,
     zip: boolean,
     type: FileTypes,
     content: Option<Bytearray>,
-    createdAt: BigInt,
-    updatedAt: Option<BigInt>,
+    createdAt: bigint,
+    updatedAt: Option<bigint>,
     parent: Option<string>,
     isShared: Option<boolean>,
   ) {
@@ -51,11 +51,11 @@ export class File {
     creator: User,
     name: string,
     path: string,
-    size: BigInt,
+    size: bigint,
     zip: boolean,
     content: Option<Bytearray>,
-    createdAt: BigInt,
-    updatedAt: Option<BigInt>,
+    createdAt: bigint,
+    updatedAt: Option<bigint>,
     parent: Option<string>,
     isShared: Option<boolean>,
   ): File {
@@ -78,10 +78,10 @@ export class File {
     creator: User,
     name: string,
     path: string,
-    size: BigInt,
+    size: bigint,
     zip: boolean,
-    createdAt: BigInt,
-    updatedAt: Option<BigInt>,
+    createdAt: bigint,
+    updatedAt: Option<bigint>,
     parent: Option<string>,
     isShared: Option<boolean>,
   ): File {
