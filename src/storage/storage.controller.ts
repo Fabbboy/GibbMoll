@@ -33,13 +33,6 @@ export default class StorageController {
     if (!files) {
       return new HttpException('No files provided', HttpStatus.BAD_REQUEST);
     }
-    /*const jwt = request.headers.authorization;
-    if (!jwt) {
-      return new HttpException(
-        'Authorization not provided',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }*/
 
     return this.storageService.upload(
       request,
