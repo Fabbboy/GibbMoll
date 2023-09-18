@@ -16,7 +16,7 @@ import StorageService from './storage.service';
 import * as Multer from 'multer';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import User from '../entities/User';
-import { UploadFileDto } from './storage.dto';
+import { MoveFilesDto, UploadFileDto } from './storage.dto';
 import { from } from '../RO/Option';
 
 @Controller('storage')
@@ -45,5 +45,11 @@ export default class StorageController {
   @Get('list')
   async list(@Req() request) {
     return this.storageService.list(request);
+  }
+
+  @Post('move')
+  @UsePipes(new ValidationPipe())
+  async moveFiles(movefilesDto: MoveFilesDto){
+    
   }
 }
