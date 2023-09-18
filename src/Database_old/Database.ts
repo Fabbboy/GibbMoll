@@ -3,7 +3,7 @@ import Config from './Config.js';
 import { unwrap } from '../RO/Option.js';
 
 export class Database {
-  connector: mariadb.Pool;
+  private readonly connector: mariadb.Pool;
 
   constructor(config: Config) {
     this.connector = mariadb.createPool({

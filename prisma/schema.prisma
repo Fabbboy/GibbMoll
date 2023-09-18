@@ -1,0 +1,30 @@
+model User {
+  id           Int     @id @default(autoincrement())
+  username     String
+  creationDate BigInt
+  password     String
+  Files        Files[]
+}
+
+model Files {
+  id        Int      @id @default(autoincrement())
+  creator   User     @relation(fields: [userId], references: [id])
+  filename  String
+  path      String
+  folder    Boolean
+  createdAt DateTime
+  updatedAt DateTime
+  mimetype  String
+  size      BigInt
+
+  userId Int
+}
+
+datasource DB {
+  provider = "mysql"
+  url      = env("DB_URL")
+}
+
+generator PrismaClient {
+  provider = "prisma-client-js"
+}

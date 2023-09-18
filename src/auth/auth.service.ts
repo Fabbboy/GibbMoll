@@ -3,7 +3,7 @@ import { UsersService } from 'src/users/users.service';
 import { UserWithoutPassword } from './user.dto';
 import { JwtService } from '@nestjs/jwt';
 import User from '../entities/User';
-import database from '../Database/Database';
+import database from '../Database_old/Database';
 
 @Injectable()
 export class AuthService {
