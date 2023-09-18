@@ -3,6 +3,7 @@ model User {
   username     String
   creationDate BigInt
   password     String
+  isAdmin      Boolean @default(false)
   Files        Files[]
 }
 
