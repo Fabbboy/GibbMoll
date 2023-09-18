@@ -6,9 +6,13 @@ import { isNone, Option } from '../RO/Option';
 import { fileService } from '../main';
 import { DatabaseService } from 'src/database/database.service';
 import { Prisma } from '@prisma/client';
+import { MoveFilesDto } from './storage.dto';
 
 @Injectable()
 export default class StorageService {
+  moveFiles(movefilesDto: MoveFilesDto) {
+    throw new Error('Method not implemented.');
+  }
   constructor(private databaseService: DatabaseService) {}
 
   async upload(

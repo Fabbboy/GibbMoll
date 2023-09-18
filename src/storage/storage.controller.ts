@@ -50,6 +50,6 @@ export default class StorageController {
   @Post('move')
   @UsePipes(new ValidationPipe())
   async moveFiles(movefilesDto: MoveFilesDto){
-    
+    return this.storageService.moveFiles(movefilesDto)
   }
 }
