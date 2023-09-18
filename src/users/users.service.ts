@@ -31,6 +31,17 @@ export class UsersService {
       data: { ...user },
     });
 
-    console.log(result);
+    const newResult: {
+      username: string;
+      password: string;
+      creationDate: number;
+      id: number;
+    } = {
+      ...user,
+      creationDate: result.creationDate as unknown as number,
+      id: result.id,
+    };
+
+    return newResult;
   }
 }
