@@ -1,4 +1,4 @@
-import { None, Option, from } from '../RO/Option';
+import { None, Option } from '../RO/Option';
 import User from './User';
 
 export enum FileTypes {
