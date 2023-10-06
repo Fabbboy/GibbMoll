@@ -10,12 +10,13 @@ model Files {
   id        Int      @id @default(autoincrement())
   creator   User     @relation(fields: [userId], references: [id])
   filename  String
-  path      String
+  path      String   
   folder    Boolean
   createdAt DateTime
   updatedAt DateTime
   mimetype  String
   size      BigInt
+  absolutePath String @unique
 
   userId Int
 }

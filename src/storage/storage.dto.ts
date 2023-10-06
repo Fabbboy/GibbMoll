@@ -12,3 +12,8 @@ export class MoveFilesDto {
   @IsNotEmpty()
   destination: string;
 }
+
+export class MkdirDto {
+  @IsNotEmpty()
+  folderName: string;
+}

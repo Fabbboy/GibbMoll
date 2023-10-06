@@ -14,7 +14,7 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import StorageService from './storage.service';
 import * as Multer from 'multer';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { MoveFilesDto, UploadFileDto } from './storage.dto';
+import { MkdirDto, MoveFilesDto, UploadFileDto } from './storage.dto';
 import { from } from '../RO/Option';
 
 @Controller('storage')
@@ -49,5 +49,11 @@ export default class StorageController {
   @UsePipes(new ValidationPipe())
   async moveFiles(@Req() req, @Body() movefilesDto: MoveFilesDto) {
     return this.storageService.moveFiles(req, movefilesDto);
+  }
+
+  @Post('mkdir')
+  @UsePipes(new ValidationPipe())
+  async mkdir(@Req() req, @Body() mkdirDto: MkdirDto) {
+    return this.storageService.mkdir(req, mkdirDto);
   }
 }
