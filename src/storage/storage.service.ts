@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as Multer from 'multer';
 import * as fs from 'fs';
+import * as path from 'path';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { isNone, Option } from '../RO/Option';
 import { fileService } from '../main';
@@ -10,9 +11,6 @@ import { MoveFilesDto } from './storage.dto';
 
 @Injectable()
 export default class StorageService {
-  moveFiles(movefilesDto: MoveFilesDto) {
-    throw new Error('Method not implemented.');
-  }
   constructor(private databaseService: DatabaseService) {}
 
   async upload(
@@ -62,5 +60,62 @@ export default class StorageService {
     return {
       files: files.map((file) => path + '/' + file),
     };
+  }
+
+  moveFiles(req: Request, movefilesDto: MoveFilesDto) {
+    const username = req['user'].username;
+    console.log(`Username: ${username}`);
+    const userBasePath = `.cloud/users/${username}`;
+    
+    if (!movefilesDto || !movefilesDto.files || !movefilesDto.destination) {
+      return {
+        message: 'Invalid or incomplete data',
+      };
+    }
+  
+    // Validate paths
+    if (
+      !this.validatePath(username, movefilesDto.destination) ||
+      !movefilesDto.files.every((file) => this.validatePath(username, file))
+    ) {
+      return {
+        message: 'Permission denied',
+      };
+    }
+  
+    try {
+      for (const file of movefilesDto.files) {
+        const absoluteSrcPath = path.join(userBasePath, file);
+        const absoluteDestPath = path.join(userBasePath, path.basename(file));
+        const absoluteDestDir = path.join(userBasePath, movefilesDto.destination);
+        
+        console.log(`Checking existence: Source(${absoluteSrcPath}), Destination(${absoluteDestDir})`);
+        
+        if (!fs.existsSync(absoluteSrcPath) || !fs.existsSync(absoluteDestDir)) {
+          console.log(`File or Directory not found. Source Exists: ${fs.existsSync(absoluteSrcPath)}, Destination Exists: ${fs.existsSync(absoluteDestDir)}`);
+          return {
+            message: 'Source or destination does not exist',
+          };
+        }
+  
+        fs.renameSync(
+          absoluteSrcPath,
+          path.join(absoluteDestDir, path.basename(file)),
+        );
+      }
+  
+      return {
+        message: 'Files moved successfully',
+      };
+    } catch (e) {
+      console.error(e);
+      return {
+        message: 'Error moving files: ' + e.message,
+      };
+    }
+  }
+  
+  private validatePath(username: string, path: string): boolean {
+    return path.startsWith(`.cloud/users/${username}`);
   }
 }

@@ -5,17 +5,15 @@ import {
   UseInterceptors,
   Query,
   Req,
-  Body,
   UsePipes,
   ValidationPipe,
   Get,
+  Body,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { Request } from 'express'; // Import the express Request type for better type checking
 import StorageService from './storage.service';
 import * as Multer from 'multer';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import User from '../entities/User';
 import { MoveFilesDto, UploadFileDto } from './storage.dto';
 import { from } from '../RO/Option';
 
@@ -49,7 +47,7 @@ export default class StorageController {
 
   @Post('move')
   @UsePipes(new ValidationPipe())
-  async moveFiles(movefilesDto: MoveFilesDto){
-    return this.storageService.moveFiles(movefilesDto)
+  async moveFiles(@Req() req, @Body() movefilesDto: MoveFilesDto) {
+    return this.storageService.moveFiles(req, movefilesDto);
   }
 }
