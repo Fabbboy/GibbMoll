@@ -69,18 +69,4 @@ export default class StorageController {
   async delete(@Req() req, @Body() files: DeleteDto) {
     return this.storageService.delete(req, files);
   }
-
-  @Get('download')
-  async download(
-    @Req() req,
-    @Res() Response,
-    @Query('file') file: DownloadDto,
-  ) {
-    const res = await this.storageService.download(req, Response, file);
-    if (res.success) {
-      Response.download(res.filePath);
-    } else {
-      return res;
-    }
-  }
 }
