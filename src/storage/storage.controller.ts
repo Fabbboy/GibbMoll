@@ -9,12 +9,13 @@ import {
   ValidationPipe,
   Get,
   Body,
+  Delete,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import StorageService from './storage.service';
 import * as Multer from 'multer';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { MkdirDto, MoveFilesDto, UploadFileDto } from './storage.dto';
+import { DeleteDto, MkdirDto, MoveFilesDto, UploadFileDto } from './storage.dto';
 import { from } from '../RO/Option';
 
 @Controller('storage')
@@ -55,5 +56,10 @@ export default class StorageController {
   @UsePipes(new ValidationPipe())
   async mkdir(@Req() req, @Body() mkdirDto: MkdirDto) {
     return this.storageService.mkdir(req, mkdirDto);
+  }
+
+  @Delete('delete')
+  async delete(@Req() req, @Body() files: DeleteDto) {
+    return this.storageService.delete(req, files);
   }
 }

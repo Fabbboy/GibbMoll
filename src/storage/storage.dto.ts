@@ -17,3 +17,8 @@ export class MkdirDto {
   @IsNotEmpty()
   folderName: string;
 }
+
+export class DeleteDto {
+  @IsNotEmpty()
+  files: string[];
+}

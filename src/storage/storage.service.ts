@@ -20,15 +20,30 @@ export default class StorageService {
   ) {
     const path = fileService.createOrGetUserFolder(req['user'].username);
     for (const file of files) {
-      if (isNone(override)) {
-        if (fs.existsSync(`${path}/${file.originalname}`)) {
-          return new HttpException(
-            'File already exists',
-            HttpStatus.BAD_REQUEST,
-          );
+      const filePath = `${path}/${file.originalname}`;
+
+      if (!isNone(override)) {
+        // If override is enabled, remove the existing file and database entry
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
         }
+        const existingFile = await this.databaseService.files.findFirst({
+          where: {
+            userId: req['user'].sub as number,
+            filename: file.originalname,
+          },
+        });
+
+        if (existingFile) {
+          await this.databaseService.files.delete({
+            where: { id: existingFile.id },
+          });
+        }
+      } else if (fs.existsSync(filePath)) {
+        return new HttpException('File already exists', HttpStatus.BAD_REQUEST);
       }
-      fs.writeFileSync(`${path}/${file.originalname}`, file.buffer);
+
+      fs.writeFileSync(filePath, file.buffer);
     }
 
     const objs: Prisma.FilesCreateManyInput[] = [];
@@ -50,6 +65,10 @@ export default class StorageService {
       await this.databaseService.files.createMany({ data: objs });
     } catch (e) {
       console.error(e);
+      // Delete the files from the disk if database insertion fails
+      for (const file of files) {
+        fs.unlinkSync(`${path}/${file.originalname}`);
+      }
       return {
         message: 'Error uploading files',
       };
@@ -143,7 +162,7 @@ export default class StorageService {
           // Update the file path in the database
           await this.databaseService.files.update({
             where: { id: file.id },
-            data: { path: destinationPath },
+            data: { path: destinationPath, absolutePath: newPath },
           });
         } else {
           console.log(
@@ -187,8 +206,66 @@ export default class StorageService {
       };
     }
   }
+  /*export class DeleteDto {
+  @IsNotEmpty()
+  files: string[];
+}
+*/
+  async delete(req: Request, deleteDto: any) {
+    try {
+      const results = []; // To store deletion status for each file or directory
 
-  private validatePath(username: string, path: string): boolean {
-    return path.startsWith(`.cloud/users/${username}`);
+      const filesInDb = await this.databaseService.files.findMany({
+        where: { userId: req['user'].sub as number },
+      });
+
+      for (const file of deleteDto.files) {
+        const username = req['user'].username;
+        const path = fileService.createOrGetUserFolder(username);
+        const filePath = path + '/' + file;
+
+        let deletedFromDB = false;
+        let deletedFromFileSystem = false;
+
+        const fileInDb = filesInDb.find((dbFile) => {
+          console.log("the file: "+  dbFile.path);
+          console.log('the path: .cloud/users/' + req['user'].username + file);
+          return (
+            dbFile.path ===
+            '.cloud/users/' + req['user'].username + file
+          );
+        });
+        if (fileInDb) {
+          await this.databaseService.files.delete({
+            where: { id: fileInDb.id },
+          });
+          deletedFromDB = true;
+        }
+
+        if (fs.existsSync(filePath)) {
+          const fileStat = fs.statSync(filePath);
+          if (fileStat.isDirectory()) {
+            fs.rmdirSync(filePath, { recursive: true });
+          } else {
+            fs.unlinkSync(filePath);
+          }
+          deletedFromFileSystem = true;
+        }
+
+        results.push({
+          filename: file,
+        });
+      }
+
+      return {
+        message: 'Files deleted successfully or not found',
+        details: results,
+      };
+    } catch (error) {
+      console.error('An error occurred:', error);
+      return {
+        message: `An error occurred while deleting files: ${error.message}`,
+      };
+    }
   }
 }
