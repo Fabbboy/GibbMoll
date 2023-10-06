@@ -10,12 +10,19 @@ import {
   Get,
   Body,
   Delete,
+  Res,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import StorageService from './storage.service';
 import * as Multer from 'multer';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { DeleteDto, MkdirDto, MoveFilesDto, UploadFileDto } from './storage.dto';
+import {
+  DeleteDto,
+  DownloadDto,
+  MkdirDto,
+  MoveFilesDto,
+  UploadFileDto,
+} from './storage.dto';
 import { from } from '../RO/Option';
 
 @Controller('storage')
@@ -61,5 +68,19 @@ export default class StorageController {
   @Delete('delete')
   async delete(@Req() req, @Body() files: DeleteDto) {
     return this.storageService.delete(req, files);
+  }
+
+  @Get('download')
+  async download(
+    @Req() req,
+    @Res() Response,
+    @Query('file') file: DownloadDto,
+  ) {
+    const res = await this.storageService.download(req, Response, file);
+    if (res.success) {
+      Response.download(res.filePath);
+    } else {
+      return res;
+    }
   }
 }

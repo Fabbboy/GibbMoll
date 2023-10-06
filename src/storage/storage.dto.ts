@@ -22,3 +22,9 @@ export class DeleteDto {
   @IsNotEmpty()
   files: string[];
 }
+
+
+export class DownloadDto {
+  @IsNotEmpty()
+  file: string;
+}

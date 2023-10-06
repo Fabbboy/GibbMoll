@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ResponseDecoratorOptions } from '@nestjs/common';
 import * as Multer from 'multer';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -7,7 +7,7 @@ import { isNone, Option } from '../RO/Option';
 import { fileService } from '../main';
 import { DatabaseService } from 'src/database/database.service';
 import { Prisma } from '@prisma/client';
-import { MoveFilesDto } from './storage.dto';
+import { DownloadDto, MoveFilesDto } from './storage.dto';
 
 @Injectable()
 export default class StorageService {
@@ -228,12 +228,9 @@ export default class StorageService {
         let deletedFromFileSystem = false;
 
         const fileInDb = filesInDb.find((dbFile) => {
-          console.log("the file: "+  dbFile.path);
+          console.log('the file: ' + dbFile.path);
           console.log('the path: .cloud/users/' + req['user'].username + file);
-          return (
-            dbFile.path ===
-            '.cloud/users/' + req['user'].username + file
-          );
+          return dbFile.path === '.cloud/users/' + req['user'].username + file;
         });
         if (fileInDb) {
           await this.databaseService.files.delete({
@@ -265,6 +262,45 @@ export default class StorageService {
       console.error('An error occurred:', error);
       return {
         message: `An error occurred while deleting files: ${error.message}`,
+      };
+    }
+  }
+
+  async download(req: Request, res: Response, downloadDto: DownloadDto) {
+    try {
+      //check if the file exists on disk and in the database
+      const username = req['user'].username;
+      const path = fileService.createOrGetUserFolder(username);
+      const filePath = path + '/' + downloadDto.file;
+
+      const fileInDb = await this.databaseService.files.findFirst({
+        where: {
+          userId: req['user'].sub as number,
+          filename: downloadDto.file,
+        },
+      });
+
+      if (!fileInDb) {
+        return {
+          message: 'File not found',
+        };
+      }
+
+    
+      if (fs.existsSync(filePath)) {
+        return {
+          success: true,
+          filePath
+        };
+      } else {
+        return {
+          message: 'File not found',
+        };
+      }
+    } catch (error) {
+      console.error('An error occurred:', error);
+      return {
+        message: `An error occurred while downloading the file: ${error.message}`,
       };
     }
   }

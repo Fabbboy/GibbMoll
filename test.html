@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Test</title>
+  </head>
+
+  <body>
+    <input type="text" id="filename" placeholder="Enter filename" />
+    <button id="download">Download</button>
+
+    <script>
+      const apiBase = 'http://localhost:3000/storage/download?file=';
+      const downloadBtn = document.getElementById('download');
+      const filenameInput = document.getElementById('filename');
+
+      // Your Bearer token (replace this with your actual token)
+      const bearerToken =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhlbGxvIiwic3ViIjoxLCJpYXQiOjE2OTY2MTMxMDcsImV4cCI6MTY5NjYxNjcwN30.B5rHn-l9HZRH9VZfXQtbp2Kgz8-Tc_BgLbzWNQKn0UU';
+
+      downloadBtn.addEventListener('click', () => {
+        console.log('clicked');
+
+        const apiUrl = apiBase + encodeURIComponent(filenameInput.value);
+        fetch(apiUrl, {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+          },
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(
+                `Network response was not ok: ${response.statusText}`,
+              );
+            }
+            return response.blob();
+          })
+          .then((blob) => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filenameInput.value;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+          })
+          .catch((err) => console.log(err));
+      });
+    </script>
+  </body>
+</html>
