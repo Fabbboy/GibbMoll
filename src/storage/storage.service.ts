@@ -1,5 +1,5 @@
-import { Body, Injectable, Post } from '@nestjs/common';
-import * as Multer from 'multer';
+import { Injectable } from '@nestjs/common';
+import * as multer from 'multer';
 import * as fs from 'fs';
 import * as path from 'path';
 import { HttpException, HttpStatus } from '@nestjs/common';
@@ -9,8 +9,6 @@ import { DatabaseService } from 'src/database/database.service';
 import { Prisma } from '@prisma/client';
 import { DeleteDto, DownloadDto, MkdirDto, MoveFilesDto } from './storage.dto';
 import { Request, Response } from 'express';
-import { ParamsDictionary } from 'express-serve-static-core';
-import { ParsedQs } from 'qs';
 import { createReadStream } from 'fs';
 import { join } from 'path';
 
@@ -25,7 +23,7 @@ export default class StorageService {
 
   async upload(
     req: Request,
-    files: Array<Multer.File>,
+    files: Array<multer.File>,
     override: Option<string>,
   ) {
     const user = this.getUser(req.user);
