@@ -24,6 +24,7 @@ import {
   UploadFileDto,
 } from './storage.dto';
 import { from } from '../RO/Option';
+import { Request, Response } from 'express';
 
 @Controller('storage')
 export default class StorageController {
@@ -68,5 +69,14 @@ export default class StorageController {
   @Delete('delete')
   async delete(@Req() req, @Body() files: DeleteDto) {
     return this.storageService.delete(req, files);
+  }
+
+  @Get('download')
+  async download(
+    @Req() req: Request,
+    @Body() downloadDto: DownloadDto,
+    @Res() res: Response,
+  ) {
+    return this.storageService.download(req, downloadDto, res);
   }
 }
