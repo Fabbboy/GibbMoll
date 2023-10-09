@@ -77,6 +77,10 @@ export default class StorageController {
     @Body() downloadDto: DownloadDto,
     @Res() res: Response,
   ) {
-    return this.storageService.download(req, downloadDto, res);
+    try {
+      return await this.storageService.download(req, downloadDto, res);
+    } catch (e) {
+      console.log(e);
+    }
   }
 }
