@@ -114,8 +114,19 @@ export default class StorageService {
       return filesInDb.some((dbFile) => dbFile.filename === filename);
     });
 
+    //also get all files where the user has reference to
+    const sharedFiles = await this.databaseService.reference.findMany({
+      where: { userId: req['user'].sub as number },
+    });
+
+    // now we have references now we need to get the files from the database
+    const filesToReturnFromShared = await this.databaseService.files.findMany({
+      where: { id: { in: sharedFiles.map((f) => f.fileId) } },
+    });
+
     return {
       files: filesToReturn,
+      sharedFiles: filesToReturnFromShared,
     };
   }
 
@@ -206,11 +217,7 @@ export default class StorageService {
       };
     }
   }
-  /*export class DeleteDto {
-  @IsNotEmpty()
-  files: string[];
-}
-*/
+
   async delete(req: Request, deleteDto: any) {
     try {
       const results = []; // To store deletion status for each file or directory
