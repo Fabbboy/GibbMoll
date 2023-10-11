@@ -74,13 +74,13 @@ export default class StorageController {
   @Get('download')
   async download(
     @Req() req: Request,
-    @Body() downloadDto: DownloadDto,
+    @Query() downloadDto: DownloadDto,
     @Res() res: Response,
   ) {
     try {
       return await this.storageService.download(req, downloadDto, res);
     } catch (e) {
-      console.log(e);
+      console.log('error' + e);
     }
   }
 }
