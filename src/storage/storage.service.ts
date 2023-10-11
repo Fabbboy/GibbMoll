@@ -1,5 +1,5 @@
-import { Injectable, ResponseDecoratorOptions } from '@nestjs/common';
-import * as Multer from 'multer';
+import { Injectable } from '@nestjs/common';
+import * as multer from 'multer';
 import * as fs from 'fs';
 import * as path from 'path';
 import { HttpException, HttpStatus } from '@nestjs/common';
@@ -7,7 +7,15 @@ import { isNone, Option } from '../RO/Option';
 import { fileService } from '../main';
 import { DatabaseService } from 'src/database/database.service';
 import { Prisma } from '@prisma/client';
-import { DownloadDto, MoveFilesDto } from './storage.dto';
+import { DeleteDto, DownloadDto, MkdirDto, MoveFilesDto } from './storage.dto';
+import { Request, Response } from 'express';
+import { createReadStream } from 'fs';
+import { join } from 'path';
+
+class User {
+  username: string;
+  sub: number;
+}
 
 @Injectable()
 export default class StorageService {
@@ -15,10 +23,12 @@ export default class StorageService {
 
   async upload(
     req: Request,
-    files: Array<Multer.File>,
+    files: Array<multer.File>,
     override: Option<string>,
   ) {
-    const path = fileService.createOrGetUserFolder(req['user'].username);
+    const user = this.getUser(req.user);
+
+    const path = fileService.createOrGetUserFolder(user.username);
     for (const file of files) {
       const filePath = `${path}/${file.originalname}`;
 
@@ -29,7 +39,7 @@ export default class StorageService {
         }
         const existingFile = await this.databaseService.files.findFirst({
           where: {
-            userId: req['user'].sub as number,
+            userId: user.sub as number,
             filename: file.originalname,
           },
         });
@@ -49,7 +59,7 @@ export default class StorageService {
     const objs: Prisma.FilesCreateManyInput[] = [];
     for (const file of files) {
       objs.push({
-        userId: req['user'].sub as number,
+        userId: user.sub as number,
         filename: file.originalname as string,
         path: path as string,
         folder: false as boolean,
@@ -81,7 +91,9 @@ export default class StorageService {
   }
 
   async list(req: Request) {
-    const rootPath = fileService.createOrGetUserFolder(req['user'].username);
+    const user = this.getUser(req.user);
+
+    const rootPath = fileService.createOrGetUserFolder(user.username);
 
     // Function to recursively get all files
     const getAllFiles = (dirPath, arrayOfFiles) => {
@@ -105,7 +117,7 @@ export default class StorageService {
 
     // Fetch all files belonging to the user from the database
     const filesInDb = await this.databaseService.files.findMany({
-      where: { userId: req['user'].sub as number },
+      where: { userId: user.sub as number },
     });
 
     // Filter out the files that are not in the database
@@ -121,7 +133,9 @@ export default class StorageService {
 
   async moveFiles(req: Request, movefilesDto: MoveFilesDto) {
     try {
-      const username = req['user'].username;
+      const user = this.getUser(req.user);
+
+      const username = user.username;
       const sourcePath = fileService.createOrGetUserFolder(username);
       const destinationPath = path.join(sourcePath, movefilesDto.destination);
 
@@ -136,7 +150,7 @@ export default class StorageService {
       }
 
       const filesInDb = await this.databaseService.files.findMany({
-        where: { userId: req['user'].sub as number },
+        where: { userId: user.sub as number },
       });
 
       const filesToMove = filesInDb.filter((file) => {
@@ -182,9 +196,11 @@ export default class StorageService {
     }
   }
 
-  async mkdir(req: Request, mkdirDto: any) {
+  async mkdir(req: Request, mkdirDto: MkdirDto) {
     try {
-      const username = req['user'].username;
+      const user = this.getUser(req.user);
+
+      const username = user.username;
       const path = fileService.createOrGetUserFolder(username);
       const folderPath = path + '/' + mkdirDto.folderName;
 
@@ -211,16 +227,18 @@ export default class StorageService {
   files: string[];
 }
 */
-  async delete(req: Request, deleteDto: any) {
+  async delete(req: Request, deleteDto: DeleteDto) {
     try {
+      const user = this.getUser(req.user);
+
       const results = []; // To store deletion status for each file or directory
 
       const filesInDb = await this.databaseService.files.findMany({
-        where: { userId: req['user'].sub as number },
+        where: { userId: user.sub as number },
       });
 
       for (const file of deleteDto.files) {
-        const username = req['user'].username;
+        const username = user.username;
         const path = fileService.createOrGetUserFolder(username);
         const filePath = path + '/' + file;
 
@@ -228,7 +246,7 @@ export default class StorageService {
         let deletedFromFileSystem = false;
 
         const fileInDb = filesInDb.find((dbFile) => {
-          return dbFile.path === '.cloud/users/' + req['user'].username + file;
+          return dbFile.path === '.cloud/users/' + user.username + file;
         });
         if (fileInDb) {
           await this.databaseService.files.delete({
@@ -262,5 +280,36 @@ export default class StorageService {
         message: `An error occurred while deleting files: ${error.message}`,
       };
     }
+  }
+
+  async download(req: Request, downloadDto: DownloadDto, res: Response) {
+    const user = this.getUser(req.user);
+
+    const username = user.username as string;
+    const path = fileService.createOrGetUserFolder(username);
+
+    const filePath = path + '/' + downloadDto.file;
+
+    const fileStream = createReadStream(join(process.cwd(), filePath));
+    fileStream.pipe(res);
+  }
+
+  getUser(user: Express.User): User {
+    if ('sub' in user && this.isNumber(user.sub)) {
+      if ('username' in user && this.isString(user.username)) {
+        return {
+          username: user.username as string,
+          sub: user.sub as number,
+        };
+      }
+    }
+  }
+
+  isString(value: unknown): value is string {
+    return typeof value === 'string';
+  }
+
+  isNumber(value: unknown): value is number {
+    return typeof value === 'number';
   }
 }

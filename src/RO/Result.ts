@@ -30,7 +30,7 @@ class Result<T, E> {
     try {
       return this.unwarp();
     } catch (_) {
-      throw new Error(error);
+      throw new Error('Error: ' + error);
     }
   }
 
