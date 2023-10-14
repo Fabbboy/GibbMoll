@@ -59,7 +59,7 @@ export class SharingService {
         if (unwrap(expirationDate) < new Date()) {
           return { error: 'Expiration date cannot be in the past' };
         }
-      } else{
+      } else {
         //create a date in 30 days
         const date = new Date();
         date.setDate(date.getDate() + 30);
@@ -79,6 +79,68 @@ export class SharingService {
     } catch (e) {
       console.error(e);
       return { error: 'Error creating share' };
+    }
+  }
+
+  async revertShare(request, body) {
+    try {
+      //parse body.fileId for number and replace it
+      body.fileId = parseInt(body.fileId);
+
+      //check if file exists
+
+      const file = await this.databaseService.files.findFirst({
+        where: {
+          userId: request['user'].sub as number,
+          id: body.fileId as number,
+        },
+      });
+
+      if (!file) {
+        return { error: 'File not found' };
+      }
+
+      //check if target user exists
+      const user = await this.databaseService.user.findFirst({
+        where: {
+          id: body.userId as number,
+        },
+      });
+
+      if (!user) {
+        return { error: 'User not found' };
+      }
+
+      //check if user has permission to share the file. (owner)
+      if (file.userId !== request['user'].sub) {
+        return { error: 'You do not have permission to share this file' };
+      }
+
+      //if references exist, delete them
+      const references = await this.databaseService.reference.findMany({
+        where: {
+          fileId: body.fileId as number,
+          userId: body.userId as number,
+        },
+      });
+
+      if (references.length === 0) {
+        return { error: 'Share not found' };
+      }
+
+      await this.databaseService.reference.deleteMany({
+        where: {
+          fileId: body.fileId,
+          userId: {
+            equals: body.userId,
+          },
+        },
+      });
+
+      return { message: 'Share reverted' };
+    } catch (e) {
+      console.error(e);
+      return { error: 'Error reverting share' };
     }
   }
 }

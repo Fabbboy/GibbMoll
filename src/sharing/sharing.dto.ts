@@ -10,3 +10,10 @@ export class CreateShareDto {
   @IsDate()
   expirationDate: Date;
 }
+
+
+export class RevertShareDto {
+  @IsNotEmpty()
+  @IsNumber()
+  fileId: number;
+}

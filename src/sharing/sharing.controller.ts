@@ -1,6 +1,14 @@
-import { Controller, Get, Post, Body, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Req,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { SharingService } from './sharing.service';
-import { CreateShareDto } from './sharing.dto';
+import { CreateShareDto, RevertShareDto } from './sharing.dto';
 
 @Controller('sharing')
 export class SharingController {
@@ -9,5 +17,10 @@ export class SharingController {
   @Post('create')
   createShare(@Req() req, @Body() body: CreateShareDto) {
     return this.sharingService.createShare(req, body);
+  }
+
+  @Delete('revert')
+  revertShare(@Req() req, @Query() body: RevertShareDto) {
+    return this.sharingService.revertShare(req, body);
   }
 }
