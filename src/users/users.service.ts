@@ -27,7 +27,7 @@ export class UsersService {
   }
 
   async createOne(user: Omit<User, 'id'>) {
-    const exsistingUser = this.databaseService.user.findFirst({
+    const exsistingUser = await this.databaseService.user.findFirst({
       where: { username: user.username },
     });
 
@@ -42,11 +42,11 @@ export class UsersService {
     const newResult: {
       username: string;
       password: string;
-      creationDate: number;
+      creationDate: string;
       id: number;
     } = {
       ...user,
-      creationDate: result.creationDate as unknown as number,
+      creationDate: result.creationDate.toString(),
       id: result.id,
     };
 

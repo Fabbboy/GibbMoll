@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as fs from 'fs';
 import { FileService } from './storage/manager/FileService';
+import { ValidationPipe } from '@nestjs/common';
 
 export const fileService: FileService = new FileService();
 
@@ -12,6 +13,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     cors: true,
   });
+
+  app.useGlobalPipes(new ValidationPipe());
 
   app.enableCors();
   app.enableCors({

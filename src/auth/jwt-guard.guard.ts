@@ -25,8 +25,10 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     return super.canActivate(context);
   }
 
-  handleRequest<TUser = CreateUserDto>(err: any, user: any): TUser {
-    console.log(typeof user + 'error: ' + typeof err);
+  handleRequest<TUser = CreateUserDto>(
+    err: unknown,
+    user: TUser | false,
+  ): TUser {
     if (err || !user) {
       throw err || new UnauthorizedException();
     }

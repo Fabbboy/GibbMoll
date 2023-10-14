@@ -23,7 +23,6 @@ export class DeleteDto {
   files: string[];
 }
 
-
 export class DownloadDto {
   @IsNotEmpty()
   file: string;
