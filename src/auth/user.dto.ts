@@ -8,3 +8,7 @@ export interface CreateUserDto {
   username: string;
   password: string;
 }
+
+export interface DeleteUserDto {
+  username: string;
+}

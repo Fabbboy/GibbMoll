@@ -11,7 +11,7 @@ import User from 'src/entities/User';
 import { LocalAuthGuard } from './local-guard.guard';
 import { Public } from './public.decorator';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from './user.dto';
+import { CreateUserDto, DeleteUserDto } from './user.dto';
 import { UsersService } from 'src/users/users.service';
 import { AdminService } from '../admin/admin.service';
 
@@ -29,6 +29,7 @@ export class AuthController {
     const user: User = req.user;
     return this.authService.login(user);
   }
+
   @Post('signup')
   async createOne(
     @Body(ValidationPipe) createUser: CreateUserDto,
@@ -43,5 +44,13 @@ export class AuthController {
       throw new UnauthorizedException('Not a Admin');
     }
     return await this.usersService.createOne(user);
+  }
+
+  async deleteUser(@Body() deleteUser: DeleteUserDto, @Request() req) {
+    if (!(await this.adminService.isUserAdmin(req.user.username))) {
+      throw new UnauthorizedException('Not a Admin');
+    }
+
+    return await this.usersService.deleteUser(deleteUser.username);
   }
 }

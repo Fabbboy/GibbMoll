@@ -52,4 +52,12 @@ export class UsersService {
 
     return newResult;
   }
+
+  async deleteUser(username: string) {
+    const user = await this.databaseService.user.findFirstOrThrow({
+      where: { username: username },
+    });
+
+    await this.databaseService.user.delete({ where: user });
+  }
 }
