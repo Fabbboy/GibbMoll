@@ -9,6 +9,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './jwt-guard.guard';
 import { PassportModule } from '@nestjs/passport';
+import { AdminModule } from 'src/admin/admin.module';
 
 @Module({
   controllers: [AuthController],
@@ -21,6 +22,7 @@ import { PassportModule } from '@nestjs/passport';
   imports: [
     UsersModule,
     PassportModule,
+    AdminModule,
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '1h' }, //{ expiresIn: '60s' },
