@@ -128,7 +128,7 @@ export default class StorageService {
 
     //also get all files where the user has reference to
     const sharedFiles = await this.databaseService.reference.findMany({
-      where: { userId: req['user'].sub as number },
+      where: { userId: user.sub as number },
     });
 
     // now we have references now we need to get the files from the database
