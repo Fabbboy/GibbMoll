@@ -6,6 +6,10 @@ import {
   Body,
   ValidationPipe,
   UnauthorizedException,
+  Delete,
+  Put,
+  Query,
+  BadRequestException,
 } from '@nestjs/common';
 import User from 'src/entities/User';
 import { LocalAuthGuard } from './local-guard.guard';
@@ -14,6 +18,8 @@ import { AuthService } from './auth.service';
 import { CreateUserDto, DeleteUserDto } from './user.dto';
 import { UsersService } from 'src/users/users.service';
 import { AdminService } from '../admin/admin.service';
+import { UpdateUserDto } from 'src/users/users.dto';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Controller('auth')
 export class AuthController {
@@ -45,12 +51,33 @@ export class AuthController {
     }
     return await this.usersService.createOne(user);
   }
-
+  @Delete('delete')
   async deleteUser(@Body() deleteUser: DeleteUserDto, @Request() req) {
     if (!(await this.adminService.isUserAdmin(req.user.username))) {
       throw new UnauthorizedException('Not a Admin');
     }
 
     return await this.usersService.deleteUser(deleteUser.username);
+  }
+
+  @Put('update')
+  async updateUser(
+    @Body() updateUserDto: UpdateUserDto,
+    @Query() username: string,
+    @Request() req,
+  ) {
+    if (!(await this.adminService.isUserAdmin(req.user.username))) {
+      throw new UnauthorizedException('Not a Admin');
+    }
+
+    try {
+      return await this.usersService.updateUser(username, updateUserDto);
+    } catch (e) {
+      if (e instanceof PrismaClientKnownRequestError && e.code == 'P2025') {
+        throw new BadRequestException('Could not find User');
+      }
+
+      throw e;
+    }
   }
 }

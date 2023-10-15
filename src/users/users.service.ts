@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import User from 'src/entities/User';
 import { DatabaseService } from '../database/database.service';
+import { UpdateUserDto } from './users.dto';
 
 @Injectable()
 export class UsersService {
@@ -59,5 +60,16 @@ export class UsersService {
     });
 
     await this.databaseService.user.delete({ where: user });
+  }
+
+  async updateUser(username: string, updateUserDto: UpdateUserDto) {
+    const user = await this.databaseService.user.findFirstOrThrow({
+      where: { username },
+    });
+
+    return await this.databaseService.user.update({
+      where: user,
+      data: updateUserDto,
+    });
   }
 }
