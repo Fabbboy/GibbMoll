@@ -126,8 +126,24 @@ export default class StorageService {
       return filesInDb.some((dbFile) => dbFile.filename === filename);
     });
 
+    //also get all files where the user has reference to
+    const sharedFiles = await this.databaseService.reference.findMany({
+      where: { userId: user.sub as number },
+    });
+
+    // now we have references now we need to get the files from the database
+    const filesToReturnFromShared = await this.databaseService.files.findMany({
+      where: { id: { in: sharedFiles.map((f) => f.fileId) } },
+    });
+
+    // filter everything bu tthe absolute path
+    const sharedFilesToReturn = filesToReturnFromShared.map(
+      (f) => f.absolutePath,
+    );
+
     return {
       files: filesToReturn,
+      sharedFiles: sharedFilesToReturn,
     };
   }
 
@@ -252,6 +268,11 @@ export default class StorageService {
           await this.databaseService.files.delete({
             where: { id: fileInDb.id },
           });
+          //delete all references to this file
+          await this.databaseService.reference.deleteMany({
+            where: { fileId: fileInDb.id },
+          });
+
           deletedFromDB = true;
         }
 

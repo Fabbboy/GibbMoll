@@ -5,6 +5,7 @@ model User {
   password     String
   isAdmin      Boolean @default(false)
   Files        Files[]
+  References   Reference[]
 }
 
 model Files {
@@ -19,7 +20,19 @@ model Files {
   size      BigInt
   absolutePath String @unique
 
+  //sharing
+  references Reference[]
+
   userId Int
+}
+
+model Reference{
+  id Int @id @default(autoincrement())
+  user User @relation(fields: [userId], references: [id])
+  file Files @relation(fields: [fileId], references: [id])
+  userId Int
+  fileId Int
+  accessExpireDate DateTime?
 }
 
 datasource DB {
