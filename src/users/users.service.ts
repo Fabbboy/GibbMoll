@@ -33,6 +33,7 @@ export class UsersService {
     });
 
     if (exsistingUser !== null) {
+      delete exsistingUser.creationDate;
       throw new HttpException('User already exists', HttpStatus.CONFLICT);
     }
 
@@ -71,5 +72,9 @@ export class UsersService {
       where: user,
       data: updateUserDto,
     });
+  }
+
+  async all() {
+    return await this.databaseService.user.findMany();
   }
 }

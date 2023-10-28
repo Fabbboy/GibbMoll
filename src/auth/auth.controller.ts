@@ -10,6 +10,7 @@ import {
   Put,
   Query,
   BadRequestException,
+  Get,
 } from '@nestjs/common';
 import User from 'src/entities/User';
 import { LocalAuthGuard } from './local-guard.guard';
@@ -19,7 +20,10 @@ import { CreateUserDto, DeleteUserDto } from './user.dto';
 import { UsersService } from 'src/users/users.service';
 import { AdminService } from '../admin/admin.service';
 import { UpdateUserDto } from 'src/users/users.dto';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import {
+  Omit,
+  PrismaClientKnownRequestError,
+} from '@prisma/client/runtime/library';
 
 @Controller('auth')
 export class AuthController {
@@ -41,6 +45,7 @@ export class AuthController {
     @Body(ValidationPipe) createUser: CreateUserDto,
     @Request() req,
   ) {
+    console.log(createUser);
     const user: Omit<User, 'id'> = {
       username: createUser.username,
       password: createUser.password,
@@ -55,6 +60,8 @@ export class AuthController {
   async deleteUser(@Body() deleteUser: DeleteUserDto, @Request() req) {
     if (!(await this.adminService.isUserAdmin(req.user.username))) {
       throw new UnauthorizedException('Not a Admin');
+    } else if (deleteUser.username == 'admin') {
+      throw new BadRequestException('You should not delete the admin user');
     }
 
     return await this.usersService.deleteUser(deleteUser.username);
@@ -79,5 +86,22 @@ export class AuthController {
 
       throw e;
     }
+  }
+
+  @Get('users')
+  async users(@Request() req) {
+    if (!(await this.adminService.isUserAdmin(req.user.username))) {
+      throw new UnauthorizedException('Not a Admin');
+    }
+
+    const result = await this.usersService.all();
+
+    return result.map((value: any) => {
+      const save = value.creationDate;
+      delete value.creationDate;
+      delete value.password;
+      value.creationDate = save.toString();
+      return value;
+    });
   }
 }

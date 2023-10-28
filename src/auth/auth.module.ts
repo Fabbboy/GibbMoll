@@ -25,7 +25,7 @@ import { AdminModule } from 'src/admin/admin.module';
     AdminModule,
     JwtModule.register({
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: '1h' }, //{ expiresIn: '60s' },
+      signOptions: { expiresIn: '2h' }, //{ expiresIn: '60s' },
     }),
   ],
 })
