@@ -68,7 +68,7 @@ export default class StorageController {
 
   @Delete('delete')
   async delete(@Req() req, @Body() files: DeleteDto) {
-    return this.storageService.delete(req, files);
+    return await this.storageService.delete(req, files);
   }
 
   @Get('download')

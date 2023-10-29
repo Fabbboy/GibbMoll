@@ -250,14 +250,18 @@ export default class StorageService {
       const results = []; // To store deletion status for each file or directory
 
       const filesInDb = await this.databaseService.files.findMany({
-        where: { userId: user.sub as number },
+        where: {
+          userId: user.sub as number,
+          filename: { in: deleteDto.files },
+        },
       });
+
+      console.log(deleteDto.files, ', ', filesInDb);
 
       for (const file of deleteDto.files) {
         const username = user.username;
         const path = fileService.createOrGetUserFolder(username);
         const filePath = path + '/' + file;
-
         let deletedFromDB = false;
         let deletedFromFileSystem = false;
 
