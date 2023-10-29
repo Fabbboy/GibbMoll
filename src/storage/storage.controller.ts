@@ -42,7 +42,7 @@ export default class StorageController {
       return new HttpException('No files provided', HttpStatus.BAD_REQUEST);
     }
 
-    return this.storageService.upload(
+    return await this.storageService.upload(
       request,
       files,
       from(uploadFileDto.override),
