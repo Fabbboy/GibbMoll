@@ -262,7 +262,7 @@ export default class StorageService {
         let deletedFromFileSystem = false;
 
         const fileInDb = filesInDb.find((dbFile) => {
-          return dbFile.path === '.cloud/users/' + user.username + file;
+          return dbFile.path === '.cloud/users/' + user.username + '/' + file;
         });
         if (fileInDb) {
           await this.databaseService.files.delete({
