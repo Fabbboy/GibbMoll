@@ -11,7 +11,6 @@ import {
   Body,
   Delete,
   Res,
-  UploadedFile,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import StorageService from './storage.service';
@@ -35,17 +34,17 @@ export default class StorageController {
   @UseInterceptors(FilesInterceptor('file'))
   @UsePipes(new ValidationPipe())
   async upload(
-    @UploadedFile() file: Multer.File,
+    @UploadedFiles() files: Array<Multer.File>,
     @Query() uploadFileDto: UploadFileDto,
     @Req() request,
   ) {
-    if (!file) {
+    if (!files) {
       return new HttpException('No files provided', HttpStatus.BAD_REQUEST);
     }
 
     return await this.storageService.upload(
       request,
-      file,
+      files,
       from(uploadFileDto.override),
     );
   }

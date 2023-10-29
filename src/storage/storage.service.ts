@@ -21,54 +21,64 @@ class User {
 export default class StorageService {
   constructor(private databaseService: DatabaseService) {}
 
-  async upload(req: Request, file: multer.File, override: Option<string>) {
+  async upload(
+    req: Request,
+    files: Array<multer.File>,
+    override: Option<string>,
+  ) {
     const user = this.getUser(req.user);
 
     const path = fileService.createOrGetUserFolder(user.username);
-    const filePath = `${path}/${file.originalname}`;
+    for (const file of files) {
+      const filePath = `${path}/${file.originalname}`;
 
-    if (!isNone(override)) {
-      // If override is enabled, remove the existing file and database entry
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-      }
-      const existingFile = await this.databaseService.files.findFirst({
-        where: {
-          userId: user.sub as number,
-          filename: file.originalname,
-        },
-      });
-
-      if (existingFile) {
-        await this.databaseService.files.delete({
-          where: { id: existingFile.id },
+      if (!isNone(override)) {
+        // If override is enabled, remove the existing file and database entry
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+        const existingFile = await this.databaseService.files.findFirst({
+          where: {
+            userId: user.sub as number,
+            filename: file.originalname,
+          },
         });
+
+        if (existingFile) {
+          await this.databaseService.files.delete({
+            where: { id: existingFile.id },
+          });
+        }
+      } else if (fs.existsSync(filePath)) {
+        return new HttpException('File already exists', HttpStatus.BAD_REQUEST);
       }
-    } else if (fs.existsSync(filePath)) {
-      return new HttpException('File already exists', HttpStatus.BAD_REQUEST);
+
+      fs.writeFileSync(filePath, file.buffer);
     }
 
-    fs.writeFileSync(filePath, file.buffer);
-
     const objs: Prisma.FilesCreateManyInput[] = [];
-    objs.push({
-      userId: user.sub as number,
-      filename: file.originalname as string,
-      path: path as string,
-      folder: false as boolean,
-      createdAt: new Date(Date.now()),
-      updatedAt: new Date(Date.now()),
-      mimetype: file.mimetype as string,
-      size: file.size as number,
-      absolutePath: `${path}/${file.originalname}` as string,
-    });
+    for (const file of files) {
+      objs.push({
+        userId: user.sub as number,
+        filename: file.originalname as string,
+        path: path as string,
+        folder: false as boolean,
+        createdAt: new Date(Date.now()),
+        updatedAt: new Date(Date.now()),
+        mimetype: file.mimetype as string,
+        size: file.size as number,
+        absolutePath: `${path}/${file.originalname}` as string,
+      });
+    }
 
     try {
       await this.databaseService.files.createMany({ data: objs });
     } catch (e) {
       console.error(e);
       // Delete the files from the disk if database insertion fails
-      fs.unlinkSync(`${path}/${file.originalname}`);
+      for (const file of files) {
+        fs.unlinkSync(`${path}/${file.originalname}`);
+      }
       return {
         message: 'Error uploading files',
       };
@@ -76,7 +86,7 @@ export default class StorageService {
 
     return {
       message: 'File uploaded successfully',
-      paths: path + '/' + file.originalname,
+      paths: files.map((file) => path + '/' + file.originalname),
     };
   }
 
